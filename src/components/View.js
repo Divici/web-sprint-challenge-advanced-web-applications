@@ -38,7 +38,6 @@ const View = (props) => {
         axiosWithAuth()
             .put(`/articles/${article.id}`, article)
             .then(resp=>{
-                console.log(resp);
                 setArticles(resp.data)
             })
             .catch(err=>{
