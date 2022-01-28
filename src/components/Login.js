@@ -1,13 +1,71 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const Login = () => {
+    const {push} = useHistory();
+
+    const [credentials, setCredentials] = useState({
+        username: '',
+        password: ''
+    })
+    const [error, setError] = useState('');
+
+    const handleChange = (e) => {
+        setCredentials({
+            ...credentials,
+            [e.target.id] : e.target.value
+        });
+    };
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+
+        axios.post('http://localhost:5000/api/login', credentials)
+            .then(resp=>{
+                localStorage.setItem('token', resp.data.token);
+                localStorage.setItem('username', resp.data.username)
+                localStorage.setItem('role', resp.data.role)
+                push('/view');
+            })
+            .catch(err=>{
+                setError(err.response.data.error)
+            })
+    }
     
     return(<ComponentContainer>
         <ModalContainer>
             <h1>Welcome to Blogger Pro</h1>
             <h2>Please enter your account information.</h2>
         </ModalContainer>
+        
+            <FormGroup onSubmit={handleLogin}>
+                <div>
+                    <Label><label htmlFor='username'>Username</label></Label>
+                    <Input
+                        type='text'
+                        id="username"
+                        value={credentials.username}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <Label htmlFor='password'>Password</Label>
+                    <Input
+                        type='password'
+                        id="password"
+                        value={credentials.password}
+                        onChange={handleChange}
+                    />
+                </div>
+                <Button id='submit'>Submit</Button>
+                {error && <p id='error'>{error}</p>}
+            </FormGroup>
+        
+
+        
+
     </ComponentContainer>);
 }
 
@@ -33,6 +91,7 @@ const ModalContainer = styled.div`
     background: white;
     padding: 2rem;
     text-align: center;
+    margin-right: 50px;
 `
 
 const Label = styled.label`
